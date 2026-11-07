@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinPay — Campus Digital Wallet & Cashback System</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation / TalentHub Simulation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="3"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <circle cx="17" cy="15" r="1"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>FinPay <span>Campus</span></h1>
+          <p class="tagline">Digital Wallet • Instant Cashback • Monthly Limit Control</p>
+        </div>
+      </div>
+
+      <!-- TalentHub Integration Widget -->
+      <div class="talenthub-bar">
+        <div class="talenthub-badge">
+          <span class="dot"></span>
+          <span>TalentHub JWT Active</span>
+        </div>
+
+        <div class="user-select-group">
+          <label for="userSelect">Active Account:</label>
+          <select id="userSelect" class="form-select user-select"></select>
+        </div>
+
+        <button id="viewTokenBtn" class="btn btn-secondary btn-sm" title="Inspect TalentHub JWT Token">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          JWT Token
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navigation Tabs -->
+  <nav class="nav-tabs-wrapper">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-wallet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <line x1="6" y1="12" x2="18" y2="12"/>
+        </svg>
+        Student Wallet & Payments
+      </button>
+
+      <button class="nav-tab" data-tab="tab-tests">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        Lab 4 Boundary Test Suite
+        <span class="badge-count" id="testBadgeCount">10 Tests</span>
+      </button>
+
+      <button class="nav-tab" data-tab="tab-reconciliation" id="reconciliationTabBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        Monthly Reconciliation (Finance)
+      </button>
+
+      <button class="nav-tab" data-tab="tab-architecture">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Detailed Design & Schema (Lab 4)
+      </button>
+    </div>
+  </nav>
+
+  <!-- App Body Container -->
+  <main class="app-main">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: Student Wallet & Payments -->
+    <!-- ========================================================================= -->
+    <div id="tab-wallet" class="tab-pane active">
+      <div class="grid-2-col">
+
+        <!-- Left Column: Wallet Card + Payment Form -->
+        <div class="column">
+
+          <!-- Wallet Overview Card -->
+          <div class="card wallet-card">
+            <div class="wallet-card-header">
+              <div>
+                <span class="wallet-label">FINPAY CAMPUS WALLET</span>
+                <h3 class="student-name-display" id="studentNameDisplay">Loading...</h3>
+                <span class="student-id-tag" id="studentIdDisplay">ID: --</span>
+              </div>
+              <div class="tier-pill-wrapper">
+                <span class="tier-badge" id="tierBadge">BASIC (1.0×)</span>
+              </div>
+            </div>
+
+            <div class="wallet-balance-row">
+              <div class="balance-item">
+                <span class="balance-title">Available Balance</span>
+                <div class="balance-amount" id="balanceRupeesDisplay">₹0.00</div>
+                <div class="balance-paise" id="balancePaiseDisplay">0 paise</div>
+              </div>
+              <div class="wallet-actions">
+                <button class="btn btn-primary" id="openTopupBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Add Money
+                </button>
+                <div class="tier-change-select-wrapper">
+                  <label for="tierSelect">Tier:</label>
+                  <select id="tierSelect" class="form-select tier-select">
+                    <option value="BASIC">BASIC (1.0× Rate & Cap)</option>
+                    <option value="PRIME">PRIME (1.5× Rate & Cap)</option>
+                    <option value="PREMIUM">PREMIUM (2.0× Rate & Cap)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="wallet-card-footer">
+              <div class="wallet-meta">
+                <span>RDBMS Source of Truth: <strong>finpay.db</strong></span>
+                <span>Idempotency Protection: <strong>ACTIVE</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Make Payment Form Card -->
+          <div class="card payment-card">
+            <div class="card-title-row">
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Make a Campus Payment
+              </h3>
+              <span class="help-text">Instant integer-paise cashback</span>
+            </div>
+
+            <form id="paymentForm" class="payment-form">
+              <!-- Merchant Selector -->
+              <div class="form-group">
+                <label for="merchantSelect">Select Campus Merchant:</label>
+                <select id="merchantSelect" class="form-select" required>
+                  <option value="">-- Choose Merchant --</option>
+                </select>
+                <div id="merchantCategoryBadge" class="merchant-badge-row"></div>
+              </div>
+
+              <!-- Amount Input in Rupees & Live Paise Conversion -->
+              <div class="form-group">
+                <label for="amountRupees">Amount (in Rupees ₹):</label>
+                <div class="input-with-prefix">
+                  <span class="currency-prefix">₹</span>
+                  <input type="number" id="amountRupees" class="form-input" min="0.01" step="0.01" placeholder="e.g. 100.00" required />
+                </div>
+                <div class="input-hint">
+                  Exact Integer: <strong id="amountPaiseCalc">0</strong> paise
+                </div>
+              </div>
+
+              <!-- Idempotency Key Section (Lab 4 Safety Rule) -->
+              <div class="form-group">
+                <div class="label-with-action">
+                  <label for="idempotencyKey">Payment Idempotency Key:</label>
+                  <button type="button" id="refreshIdempKeyBtn" class="btn-link">Generate New</button>
+                </div>
+                <div class="input-with-action">
+                  <input type="text" id="idempotencyKey" class="form-input font-mono" required />
+                  <button type="button" id="replayDuplicateBtn" class="btn btn-warning btn-sm" title="Tests that identical key doesn't double-charge">
+                    Re-send Duplicate
+                  </button>
+                </div>
+                <small class="form-help">
+                  Guarantees safety against double-charging via <code>UNIQUE(wallet_id, idempotency_key)</code>.
+                </small>
+              </div>
+
+              <!-- Live Cashback Calculation Preview Card -->
+              <div id="cashbackPreviewCard" class="preview-card">
+                <div class="preview-header">
+                  <span>LIVE CASHBACK BREAKDOWN</span>
+                  <span id="previewEffectiveRate" class="rate-badge">0.0% Rate</span>
+                </div>
+                <div class="preview-grid">
+                  <div class="preview-col">
+                    <span class="preview-label">Raw Cashback (Algorithm)</span>
+                    <strong id="previewRawCashback">0 paise (₹0.00)</strong>
+                  </div>
+                  <div class="preview-col">
+                    <span class="preview-label">Monthly Cap Remaining</span>
+                    <strong id="previewRemainingCap">0 paise (₹0.00)</strong>
+                  </div>
+                  <div class="preview-col highlight">
+                    <span class="preview-label">Final Awarded Cashback</span>
+                    <strong id="previewAwardedCashback" class="text-emerald">0 paise (₹0.00)</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Payment Button -->
+              <button type="submit" id="paySubmitBtn" class="btn btn-success btn-block btn-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+                Confirm & Pay Now
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Monthly Category Caps & Transaction History -->
+        <div class="column">
+
+          <!-- Monthly Category Limits Card -->
+          <div class="card limits-card">
+            <div class="card-title-row">
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                Monthly Cashback Limits by Category
+              </h3>
+              <span class="current-month-badge" id="currentMonthBadge">Current Month</span>
+            </div>
+            <p class="section-desc">
+              FinPay automatically tracks cashback earned per calendar month. When a category cap is reached, further payments earn 0 cashback.
+            </p>
+
+            <div id="categoryLimitsList" class="category-limits-list">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+
+          <!-- Transaction History Card -->
+          <div class="card history-card">
+            <div class="card-title-row">
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                My Transaction History
+              </h3>
+              <button id="refreshTxBtn" class="btn btn-secondary btn-sm">Refresh</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table" id="transactionsTable">
+                <thead>
+                  <tr>
+                    <th>Tx ID</th>
+                    <th>Date/Time</th>
+                    <th>Merchant</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Cashback</th>
+                    <th>Idempotency Key</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center text-muted">No transactions recorded yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: Lab 4 Boundary Test Suite -->
+    <!-- ========================================================================= -->
+    <div id="tab-tests" class="tab-pane">
+      <div class="card">
+        <div class="card-title-row">
+          <div>
+            <h2>Laboratory 4 – AI-Assisted Algorithm & Edge-Case Verification</h2>
+            <p class="section-desc">
+              Direct verification of all 10 boundary test cases specified in Table 3 of the Lab 4 manual.
+              Proves exact integer division (<code>amount × rate_bps × tier_mult_x10 DIV 100000</code>), floor cut-offs, 1-paise boundary, zero rate top-ups, and monthly cap exhaustion.
+            </p>
+          </div>
+          <button id="runTestsBtn" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Re-run All 10 Tests
+          </button>
+        </div>
+
+        <!-- Test Metrics Summary Banner -->
+        <div class="test-summary-banner" id="testSummaryBanner">
+          <div class="test-stat-pill success">
+            <span class="stat-number" id="testPassedCount">10</span>
+            <span class="stat-text">Tests Passed</span>
+          </div>
+          <div class="test-stat-pill" id="testFailedPill">
+            <span class="stat-number" id="testFailedCount">0</span>
+            <span class="stat-text">Failed</span>
+          </div>
+          <div class="test-info-text">
+            All 10 test cases from Table 3 in the Lab 4 Detailed Design Record validate with 100% mathematical precision.
+          </div>
+        </div>
+
+        <!-- Test Results Table -->
+        <div class="table-responsive">
+          <table class="data-table tests-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">#</th>
+                <th>Scenario / Purpose</th>
+                <th>Test Inputs</th>
+                <th>Formula & Arithmetic Logic</th>
+                <th>Expected</th>
+                <th>Actual</th>
+                <th style="width: 90px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="testResultsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Comparative Explanation Note from Document -->
+        <div class="callout callout-info mt-4">
+          <h4>💡 Why One-step Floor Division (Alternative A) was chosen over Two-step (Alternative B):</h4>
+          <p>
+            In Case #2 (1,234 paise at Canteen for PRIME tier):<br>
+            • <strong>Alternative A (Approved):</strong> <code>1,234 × 200 × 15 ÷ 100,000 = 3,702,000 ÷ 100,000 = 37.02 → cut off to 37 paise</code>.<br>
+            • <strong>Alternative B (AI original proposal):</strong> Truncates base canteen cashback first (1,234 × 2% = 24.68 → 24), then applies 1.5x tier (24 × 1.5 = 36), losing 1 paise unnecessarily.<br>
+            FinPay implements Alternative A to avoid double-truncation and guarantee precision.
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: Finance & Admin Monthly Reconciliation -->
+    <!-- ========================================================================= -->
+    <div id="tab-reconciliation" class="tab-pane">
+      <div class="card">
+        <div class="card-title-row">
+          <div>
+            <h2>Campus Monthly Financial Reconciliation</h2>
+            <p class="section-desc">
+              Authorized Finance & Admin module (Role-based access). Reviews transaction totals, category cashback limits, and audits total system wallet balances.
+            </p>
+          </div>
+          <div class="reconciliation-filter-group">
+            <label for="reconMonthInput">Audit Month:</label>
+            <input type="month" id="reconMonthInput" class="form-input" />
+            <button id="loadReconBtn" class="btn btn-secondary">Load Audit</button>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-title">Total Transactions</span>
+            <div class="kpi-value" id="kpiTotalTx">0</div>
+            <span class="kpi-sub">Payments & Top-ups</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Payments Volume</span>
+            <div class="kpi-value text-blue" id="kpiTotalPayments">₹0.00</div>
+            <span class="kpi-sub" id="kpiTotalPaymentsPaise">0 paise</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Cashback Disbursed</span>
+            <div class="kpi-value text-emerald" id="kpiTotalCashback">₹0.00</div>
+            <span class="kpi-sub" id="kpiTotalCashbackPaise">0 paise</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Wallet Balances</span>
+            <div class="kpi-value text-purple" id="kpiTotalBalances">₹0.00</div>
+            <span class="kpi-sub" id="kpiTotalBalancesPaise">In system circulation</span>
+          </div>
+        </div>
+
+        <div class="grid-2-col mt-4">
+          <!-- Category Breakdown -->
+          <div class="column">
+            <div class="subcard">
+              <h3>Cashback & Volume by Merchant Category</h3>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Tx Count</th>
+                      <th>Volume (₹)</th>
+                      <th>Cashback Disbursed</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reconCategoryTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Merchant Breakdown -->
+          <div class="column">
+            <div class="subcard">
+              <h3>Merchant Settlement Breakdown</h3>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Merchant</th>
+                      <th>Category</th>
+                      <th>Tx Count</th>
+                      <th>Settled (₹)</th>
+                      <th>Cashback</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reconMerchantTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Transactions Ledger for the Month -->
+        <div class="subcard mt-4">
+          <div class="card-title-row">
+            <h3>Complete Monthly Audit Ledger</h3>
+            <span class="badge" id="ledgerCountBadge">0 Records</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" id="reconciliationLedgerTable">
+              <thead>
+                <tr>
+                  <th>Tx ID</th>
+                  <th>Timestamp</th>
+                  <th>Student ID</th>
+                  <th>Merchant</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Cashback</th>
+                  <th>Idempotency Key</th>
+                </tr>
+              </thead>
+              <tbody id="reconLedgerTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: Detailed Design & Schema (Lab 4 DDR) -->
+    <!-- ========================================================================= -->
+    <div id="tab-architecture" class="tab-pane">
+      <div class="card">
+        <h2>Laboratory 4 – Final Detailed Design Reference</h2>
+        <p class="section-desc">
+          Architecture overview, 3NF/BCNF relational database schema, and security controls approved in the Lab 4 Consolidated Detailed Design Record (DDR).
+        </p>
+
+        <!-- 4-Layer Architecture Diagram -->
+        <div class="subcard mt-3">
+          <h3>1. FinPay Layered Software Architecture</h3>
+          <div class="arch-layer-grid">
+            <div class="arch-layer-card router-layer">
+              <span class="layer-badge">1. ROUTER LAYER</span>
+              <h4>Flask HTTP Endpoints</h4>
+              <ul>
+                <li>Validates TalentHub JWT token (signature, expiry, roles: student, finance).</li>
+                <li>Rejects invalid tokens with <code>401 Unauthorized</code>.</li>
+                <li>Extracts student_id from token subject claim.</li>
+              </ul>
+            </div>
+            <div class="arch-layer-card service-layer">
+              <span class="layer-badge">2. SERVICE LAYER</span>
+              <h4>Business Logic & Limits</h4>
+              <ul>
+                <li><strong>process_payment():</strong> Orchestrates payment atomic flow.</li>
+                <li><strong>calculate_cashback():</strong> Pure floor DIV integer algorithm.</li>
+                <li><strong>Ownership Check:</strong> <code>wallet.student_id == token.sub</code> (403 if mismatch).</li>
+                <li><strong>Monthly Cap:</strong> Enforces calendar-month limits via SUM query.</li>
+              </ul>
+            </div>
+            <div class="arch-layer-card repo-layer">
+              <span class="layer-badge">3. REPOSITORY LAYER</span>
+              <h4>Parameterized SQL</h4>
+              <ul>
+                <li><code>FinPayRepository</code> handles parameterized queries.</li>
+                <li>Enforces <code>PRAGMA foreign_keys = ON</code>.</li>
+                <li>Index on <code>(wallet_id, created_at)</code> for fast monthly SUM.</li>
+              </ul>
+            </div>
+            <div class="arch-layer-card db-layer">
+              <span class="layer-badge">4. DATABASE LAYER</span>
+              <h4>SQLite (Option A: RDBMS Only)</h4>
+              <ul>
+                <li>Stores all money as whole integer <code>paise</code>.</li>
+                <li>Stores rates in basis points (<code>rate_bps</code>).</li>
+                <li>Guarantees ACID transactions with <code>BEGIN IMMEDIATE</code>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database Schema Tables in 3NF / BCNF -->
+        <div class="subcard mt-4">
+          <h3>2. Normalized Relational Schema (3NF & BCNF)</h3>
+          <div class="schema-tables-grid">
+            
+            <div class="schema-table-card">
+              <div class="schema-table-header">
+                <strong>WALLET_TIER</strong>
+                <span class="schema-type">Lookup Table</span>
+              </div>
+              <pre><code>tier TEXT PRIMARY KEY
+rate_mult_x10 INTEGER NOT NULL
+cap_mult_x10  INTEGER NOT NULL
+
+-- Fixed Data:
+BASIC   (10, 10)  -- 1.0x
+PRIME   (15, 15)  -- 1.5x
+PREMIUM (20, 20)  -- 2.0x</code></pre>
+            </div>
+
+            <div class="schema-table-card">
+              <div class="schema-table-header">
+                <strong>CASHBACK_RULE</strong>
+                <span class="schema-type">Lookup Table</span>
+              </div>
+              <pre><code>category_code           TEXT PRIMARY KEY
+rate_bps                INTEGER NOT NULL
+basic_monthly_cap_paise INTEGER NOT NULL
+
+-- Fixed Data:
+CANTEEN    (200 bps = 2.0%, ₹50 cap)
+STATIONERY (100 bps = 1.0%, ₹20 cap)
+TRANSPORT  (300 bps = 3.0%, ₹100 cap)
+HOSTEL     ( 50 bps = 0.5%, ₹200 cap)
+ONLINE     (100 bps = 1.0%, ₹30 cap)
+TOPUP      (  0 bps = 0.0%, ₹0 cap)</code></pre>
+            </div>
+
+            <div class="schema-table-card">
+              <div class="schema-table-header">
+                <strong>WALLET</strong>
+                <span class="schema-type">Entity Table</span>
+              </div>
+              <pre><code>wallet_id     INTEGER PRIMARY KEY AUTOINCREMENT
+student_id    TEXT UNIQUE NOT NULL
+tier          TEXT NOT NULL REFERENCES WALLET_TIER(tier)
+balance_paise INTEGER NOT NULL CHECK(balance_paise >= 0)
+
+-- /monthly_cashback is a derived attribute,
+-- not stored to prevent stale-data anomalies.</code></pre>
+            </div>
+
+            <div class="schema-table-card">
+              <div class="schema-table-header">
+                <strong>MERCHANT</strong>
+                <span class="schema-type">Entity Table</span>
+              </div>
+              <pre><code>merchant_id   INTEGER PRIMARY KEY AUTOINCREMENT
+merchant_name TEXT NOT NULL
+category_code TEXT NOT NULL REFERENCES CASHBACK_RULE(category_code)
+ON DELETE RESTRICT</code></pre>
+            </div>
+
+            <div class="schema-table-card full-width">
+              <div class="schema-table-header">
+                <strong>TRANSACTION</strong>
+                <span class="schema-type">Transactional Audit Ledger</span>
+              </div>
+              <pre><code>transaction_id  INTEGER PRIMARY KEY AUTOINCREMENT
+wallet_id       INTEGER NOT NULL REFERENCES WALLET(wallet_id) ON DELETE RESTRICT
+merchant_id     INTEGER NOT NULL REFERENCES MERCHANT(merchant_id) ON DELETE RESTRICT
+idempotency_key TEXT NOT NULL
+amount_paise    INTEGER NOT NULL CHECK(amount_paise > 0)
+cashback_paise  INTEGER NOT NULL CHECK(cashback_paise >= 0)
+created_at      TEXT NOT NULL
+
+CONSTRAINT unique_wallet_idemp UNIQUE(wallet_id, idempotency_key)
+INDEX idx_trans_wallet_created ON TRANSACTION(wallet_id, created_at)</code></pre>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Security Design Summary -->
+        <div class="subcard mt-4">
+          <h3>3. Key Security Controls Approved in DDR (Part C)</h3>
+          <div class="security-controls-list">
+            <div class="sec-item">
+              <strong>1. TalentHub JWT Authentication & Service Ownership Check (Control B):</strong>
+              <p>JWT signature is verified in the router; the service layer checks <code>wallet.student_id == token.subject</code>. Prevents student A from making payments on student B's wallet.</p>
+            </div>
+            <div class="sec-item">
+              <strong>2. Role-Based Field Filtering (Control A):</strong>
+              <p>Each endpoint returns only the data authorized for the caller. Students see only their own wallet and transaction history; Finance officers see reconciliation aggregations.</p>
+            </div>
+            <div class="sec-item">
+              <strong>3. Database-Level Idempotency Check (Control A):</strong>
+              <p>Enforced by <code>UNIQUE(wallet_id, idempotency_key)</code>. Re-submitting the exact same idempotency key returns the original transaction record without duplicate debits or cashback.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: Add Money / Top-up -->
+  <!-- ========================================================================= -->
+  <div id="topupModal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Top Up FinPay Wallet</h3>
+        <button id="closeTopupModalBtn" class="btn-close">&times;</button>
+      </div>
+      <form id="topupForm">
+        <div class="modal-body">
+          <p class="text-muted">
+            Credits your campus wallet balance. In accordance with FinPay rules, top-ups carry 0% cashback and are logged in the transaction audit trail.
+          </p>
+
+          <div class="form-group">
+            <label>Quick Amounts:</label>
+            <div class="quick-amounts-row">
+              <button type="button" class="btn btn-chip" data-amount="50">₹50</button>
+              <button type="button" class="btn btn-chip" data-amount="100">₹100</button>
+              <button type="button" class="btn btn-chip" data-amount="500">₹500</button>
+              <button type="button" class="btn btn-chip" data-amount="1000">₹1,000</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="topupRupeesInput">Amount in Rupees (₹):</label>
+            <div class="input-with-prefix">
+              <span class="currency-prefix">₹</span>
+              <input type="number" id="topupRupeesInput" class="form-input" min="1" step="1" placeholder="e.g. 500" required />
+            </div>
+            <div class="input-hint">
+              Equals: <strong id="topupPaiseCalc">0</strong> paise
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancelTopupBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm Top-up</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: View Active TalentHub JWT -->
+  <!-- ========================================================================= -->
+  <div id="jwtModal" class="modal-backdrop hidden">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>TalentHub JWT Token Details</h3>
+        <button id="closeJwtModalBtn" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">
+          FinPay reuses TalentHub's JWT infrastructure. The token is verified on every API request.
+        </p>
+
+        <div class="form-group">
+          <label>Raw Encoded Bearer Token:</label>
+          <textarea id="rawJwtDisplay" class="form-textarea font-mono" rows="3" readonly></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Decoded Claims (Payload):</label>
+          <pre id="decodedJwtDisplay" class="json-code-box"><code>{}</code></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="copyJwtBtn" class="btn btn-secondary">Copy Token</button>
+        <button type="button" id="closeJwtModalFooterBtn" class="btn btn-primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- JavaScript Application Entry -->
+  <script src="js/app.js"></script>
+</body>
+</html>
+

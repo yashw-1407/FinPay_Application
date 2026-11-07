@@ -1,0 +1,4 @@
+flask==3.0.3
+flask-cors==6.0.5
+pyjwt==2.10.1
+
